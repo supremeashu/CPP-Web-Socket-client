@@ -1,0 +1,70 @@
+
+# BUILD.gn - Main build file
+
+# Define common compiler flags
+config("compiler_defaults") {
+  cflags = [
+    "-Wall",
+    "-Wextra",
+    "-pedantic",
+    "-std=c++17",
+  ]
+}
+
+# Debug configuration with additional debugging flags
+config("debug_config") {
+  cflags = [
+    "-g",
+    "-O0",
+    "-DDEBUG",
+  ]
+}
+
+
+# Release configuration with optimization flags
+config("release_config") {
+  cflags = [
+    "-O3",
+    "-DNDEBUG",
+  ]
+}
+
+# WebSocket client executable
+executable("websocket_client") {
+  sources = [
+    "main.cpp",
+  ]
+  
+  # Add include paths
+  include_dirs = [
+    "//",
+  ]
+  
+
+  # Link necessary libraries
+  libs = [
+    "boost_system",
+    "boost_beast",
+    "ssl",
+    "crypto",
+    "pthread",
+  ]
+  
+  # Apply default compiler configuration
+  configs = [ ":compiler_defaults" ]
+  
+  # Apply build type specific configuration
+  if (is_debug) {
+    configs += [ ":debug_config" ]
+  } else {
+    configs += [ ":release_config" ]
+  }
+}
+
+# Default target to build
+
+group("default") {
+  deps = [
+    ":websocket_client",
+  ]
+}
